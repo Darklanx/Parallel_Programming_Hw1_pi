@@ -13,8 +13,9 @@ unsigned long long number_of_cpu, number_of_tosses, number_in_circle = 0;
 clock_t begin_time;
 
 void *toss(void *params) {
-    Params *_params = (Params *)params;
 
+    Params *_params = (Params *)params;
+    printf("thread %d start at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
     unsigned long long _number_in_circle = 0;
     for (int toss = 0; toss < _params->toss; toss++) {
         // x = random double between -1 and 1;
@@ -33,6 +34,7 @@ void *toss(void *params) {
     pthread_mutex_unlock(&lock);
     */
     delete _params;
+    printf("thread %d done at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
     pthread_exit((void *)new unsigned long long(_number_in_circle));
 }
 
