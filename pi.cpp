@@ -3,11 +3,14 @@
 #include <stdlib.h>
 
 //#define N_THREAD 1
+typedef unsigned long long ull;
+#define int ull
 int N_THREAD;
 struct Params {
     int id;
-    int toss;
+    ull toss;
 };
+
 pthread_mutex_t lock;
 unsigned long long number_of_cpu, number_of_tosses, number_in_circle = 0;
 clock_t begin_time;
@@ -17,13 +20,14 @@ void *toss(void *params) {
     Params *_params = (Params *)params;
     printf("thread %d start at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
     unsigned long long _number_in_circle = 0;
-    for (int toss = 0; toss < _params->toss; toss++) {
+    double x, y, distance_squared;
+    for (ull toss = 0; toss < _params->toss; toss++) {
         // x = random double between -1 and 1;
         // y = random double between -1 and 1;
-        double x = (double)rand() / RAND_MAX;
-        double y = (double)rand() / RAND_MAX;
+        x = (double)rand() / RAND_MAX;
+        y = (double)rand() / RAND_MAX;
 
-        double distance_squared = x * x + y * y;
+        distance_squared = x * x + y * y;
         if (distance_squared <= 1)
             _number_in_circle++;
     }
@@ -33,12 +37,13 @@ void *toss(void *params) {
     number_in_circle += _number_in_circle;
     pthread_mutex_unlock(&lock);
     */
-    delete _params;
     printf("thread %d done at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
+    delete _params;
+
     pthread_exit((void *)new unsigned long long(_number_in_circle));
 }
 
-int main(int argc, char **argv) {
+int32_t main(int32_t argc, char **argv) {
     begin_time = clock();
     double pi_estimate, distance_squared, x, y;
     pthread_mutex_init(&lock, NULL);
@@ -52,7 +57,7 @@ int main(int argc, char **argv) {
     }
 
     // start here
-    pthread_t threads[100];
+    pthread_t threads[5];
     printf("Before create: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
     for (int i = 0; i < N_THREAD; i++) {
         Params *params = new Params();
