@@ -4,7 +4,7 @@
 
 //#define N_THREAD 1
 typedef unsigned long long ull;
-#define int ull
+//#define int ull
 int N_THREAD;
 struct Params {
     int id;
@@ -18,26 +18,34 @@ clock_t begin_time;
 void *toss(void *params) {
 
     Params *_params = (Params *)params;
-    printf("thread %d start at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
+    //printf("thread %d start at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
     unsigned long long _number_in_circle = 0;
     double x, y, distance_squared;
+    unsigned int seed = time(NULL);
     for (ull toss = 0; toss < _params->toss; toss++) {
         // x = random double between -1 and 1;
         // y = random double between -1 and 1;
-        x = (double)rand() / RAND_MAX;
-        y = (double)rand() / RAND_MAX;
 
+        //printf("seed %u\n", seed);
+        x = (double)rand_r(&seed) / RAND_MAX;
+        y = (double)rand_r(&seed) / RAND_MAX;
+
+        /*
+        if (toss % 100 == 0) {
+            printf("thread %d access toss: %lld at: %f\n", _params->id, toss, float(clock() - begin_time) / CLOCKS_PER_SEC);
+        }
+        */
         distance_squared = x * x + y * y;
         if (distance_squared <= 1)
             _number_in_circle++;
     }
-    printf("total toss: %d\n", _params->toss);
+    //printf("total toss: %lld\n", _params->toss);
     /*
     pthread_mutex_lock(&lock);
     number_in_circle += _number_in_circle;
     pthread_mutex_unlock(&lock);
     */
-    printf("thread %d done at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
+    //printf("thread %d done at: %f\n", _params->id, float(clock() - begin_time) / CLOCKS_PER_SEC);
     delete _params;
 
     pthread_exit((void *)new unsigned long long(_number_in_circle));
@@ -57,8 +65,8 @@ int32_t main(int32_t argc, char **argv) {
     }
 
     // start here
-    pthread_t threads[5];
-    printf("Before create: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+    pthread_t threads[20];
+    //printf("Before create: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
     for (int i = 0; i < N_THREAD; i++) {
         Params *params = new Params();
         params->toss = number_of_tosses / N_THREAD + (i < (number_of_tosses % N_THREAD));
@@ -68,8 +76,8 @@ int32_t main(int32_t argc, char **argv) {
         pthread_create(&threads[i], NULL, toss, (void *)params);
     }
 
-    printf("After create: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
-    printf("Before Join: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+    //printf("After create: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+    //printf("Before Join: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
 
     void *rv;
     for (int i = 0; i < N_THREAD; i++) {
@@ -79,7 +87,7 @@ int32_t main(int32_t argc, char **argv) {
         number_in_circle += *(unsigned long long *)rv;
         delete (unsigned long long *)rv;
     }
-    printf("After Join: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+    //printf("After Join: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
 
     /*
     for (toss = 0; toss < number_of_tosses; toss++) {
