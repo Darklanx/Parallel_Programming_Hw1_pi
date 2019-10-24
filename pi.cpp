@@ -75,6 +75,6 @@ int main(int argc, char **argv) {
 
     printf("%f\n", pi_estimate);
     pthread_mutex_destroy(&lock);
-    printf("%f", float(clock() - begin_time) / CLOCKS_PER_SEC);
+    printf("%f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
     return 0;
 }
