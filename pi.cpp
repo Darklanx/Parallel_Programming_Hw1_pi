@@ -10,10 +10,12 @@ struct Params {
 };
 pthread_mutex_t lock;
 unsigned long long number_of_cpu, number_of_tosses, number_in_circle = 0;
+clock_t begin_time;
 
 void *toss(void *params) {
     Params *_params = (Params *)params;
-    int _number_in_circle = 0;
+
+    unsigned long long _number_in_circle = 0;
     for (int toss = 0; toss < _params->toss; toss++) {
         // x = random double between -1 and 1;
         // y = random double between -1 and 1;
@@ -24,15 +26,18 @@ void *toss(void *params) {
         if (distance_squared <= 1)
             _number_in_circle++;
     }
+    printf("total toss: %d\n", _params->toss);
+    /*
     pthread_mutex_lock(&lock);
     number_in_circle += _number_in_circle;
     pthread_mutex_unlock(&lock);
+    */
     delete _params;
-    pthread_exit(0);
+    pthread_exit((void *)new unsigned long long(_number_in_circle));
 }
 
 int main(int argc, char **argv) {
-    const clock_t begin_time = clock();
+    begin_time = clock();
     double pi_estimate, distance_squared, x, y;
     pthread_mutex_init(&lock, NULL);
     if (argc < 2) {
@@ -46,7 +51,7 @@ int main(int argc, char **argv) {
 
     // start here
     pthread_t threads[100];
-
+    printf("Before create: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
     for (int i = 0; i < N_THREAD; i++) {
         Params *params = new Params();
         params->toss = number_of_tosses / N_THREAD + (i < (number_of_tosses % N_THREAD));
@@ -56,9 +61,19 @@ int main(int argc, char **argv) {
         pthread_create(&threads[i], NULL, toss, (void *)params);
     }
 
+    printf("After create: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+    printf("Before Join: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+
+    void *rv;
     for (int i = 0; i < N_THREAD; i++) {
-        pthread_join(threads[i], NULL);
+
+        //pthread_join(threads[i], NULL);
+        pthread_join(threads[i], &rv);
+        number_in_circle += *(unsigned long long *)rv;
+        delete (unsigned long long *)rv;
     }
+    printf("After Join: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+
     /*
     for (toss = 0; toss < number_of_tosses; toss++) {
         // x = random double between -1 and 1;
@@ -75,6 +90,6 @@ int main(int argc, char **argv) {
 
     printf("%f\n", pi_estimate);
     pthread_mutex_destroy(&lock);
-    printf("%f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
+    printf("Total Time: %f\n", float(clock() - begin_time) / CLOCKS_PER_SEC);
     return 0;
 }
