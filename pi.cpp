@@ -1,7 +1,7 @@
+#include <ctime>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 //#define N_THREAD 1
 typedef unsigned long long ull;
 //#define int ull
@@ -13,7 +13,6 @@ struct Params {
 
 pthread_mutex_t lock;
 unsigned long long number_of_cpu, number_of_tosses, number_in_circle = 0;
-clock_t begin_time;
 
 void *toss(void *params) {
 
@@ -44,7 +43,6 @@ void *toss(void *params) {
 }
 
 int32_t main(int32_t argc, char **argv) {
-    begin_time = clock();
     double pi_estimate, distance_squared, x, y;
     pthread_mutex_init(&lock, NULL);
     if (argc < 2) {
@@ -73,6 +71,7 @@ int32_t main(int32_t argc, char **argv) {
     pi_estimate = 4 * number_in_circle / ((double)number_of_tosses);
 
     printf("%f\n", pi_estimate);
+
     pthread_mutex_destroy(&lock);
     return 0;
 }
