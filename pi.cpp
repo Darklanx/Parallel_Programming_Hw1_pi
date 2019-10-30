@@ -11,7 +11,7 @@ struct Params {
     ull toss;
 };
 
-pthread_mutex_t lock;
+pthread_mutex_t lock1;
 unsigned long long number_of_cpu, number_of_tosses, number_in_circle = 0;
 
 void *toss(void *params) {
@@ -33,9 +33,9 @@ void *toss(void *params) {
             _number_in_circle++;
     }
 
-    pthread_mutex_lock(&lock);
+    pthread_mutex_lock(&lock1);
     number_in_circle += _number_in_circle;
-    pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock1);
 
     delete _params;
 
@@ -44,7 +44,7 @@ void *toss(void *params) {
 
 int32_t main(int32_t argc, char **argv) {
     double pi_estimate, distance_squared, x, y;
-    pthread_mutex_init(&lock, NULL);
+    pthread_mutex_init(&lock1, NULL);
     if (argc < 2) {
         exit(-1);
     }
@@ -72,6 +72,6 @@ int32_t main(int32_t argc, char **argv) {
 
     printf("%f\n", pi_estimate);
 
-    pthread_mutex_destroy(&lock);
+    pthread_mutex_destroy(&lock1);
     return 0;
 }
