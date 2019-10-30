@@ -11,13 +11,12 @@ int N_THREAD;
 struct Params {
     int id;
     ull toss;
-    int n_thread_to_create;
 };
 
 pthread_mutex_t lock1;
 unsigned long long number_of_cpu, number_of_tosses, number_in_circle = 0;
 
-ull toss(int n_toss) {
+ull toss(ull n_toss) {
 
     unsigned long long _number_in_circle = 0;
     double x, y, distance_squared;
