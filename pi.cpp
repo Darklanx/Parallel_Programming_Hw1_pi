@@ -40,7 +40,8 @@ void *toss(void *params) {
 
     delete _params;
 
-    pthread_exit((void *)new unsigned long long(_number_in_circle));
+    //pthread_exit((void *)new unsigned long long(_number_in_circle));
+    pthread_exit(0);
 }
 
 int32_t main(int32_t argc, char **argv) {
@@ -49,7 +50,7 @@ int32_t main(int32_t argc, char **argv) {
     if (argc < 2) {
         exit(-1);
     }
-    N_THREAD = number_of_cpu = std::max(atoi(argv[1]), 20);
+    N_THREAD = number_of_cpu = std::min(atoi(argv[1]), 20);
     number_of_tosses = strtoull(argv[2], NULL, 10);
 
     if ((number_of_cpu < 1) || (number_of_tosses < 0)) {
