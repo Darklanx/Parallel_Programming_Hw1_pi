@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <ctime>
 #include <pthread.h>
 #include <stdio.h>
@@ -48,7 +49,7 @@ int32_t main(int32_t argc, char **argv) {
     if (argc < 2) {
         exit(-1);
     }
-    N_THREAD = number_of_cpu = atoi(argv[1]);
+    N_THREAD = number_of_cpu = std::max(atoi(argv[1]), 20);
     number_of_tosses = strtoull(argv[2], NULL, 10);
 
     if ((number_of_cpu < 1) || (number_of_tosses < 0)) {
